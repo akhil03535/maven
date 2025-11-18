@@ -7,7 +7,7 @@ public class App {
     }
 
     public static void main(String[] args) {
-       System.out.print("Hello AKhil");
+     
         System.out.println(greet((args.length > 0) ? args[0] : null));
     }
 }

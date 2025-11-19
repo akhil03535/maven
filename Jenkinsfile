@@ -1,31 +1,48 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven-Default'     // the Maven name you added in Jenkins Global Tools
+        jdk 'jdk11'               // OR whatever JDK name is configured
+    }
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/akhil03535/maven.git'
+                checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building the Maven project...'
-                bat 'mvn clean install'
+                bat 'mvn -B clean package'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
                 bat 'mvn test'
+            }
+            post {
+                always {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Archive Artifact') {
+            steps {
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
     }
 
     post {
-        always {
-            echo "Pipeline completed!"
+        success {
+            echo "Build Success!"
+        }
+        failure {
+            echo "Build Failed!"
         }
     }
 }
